@@ -33,22 +33,32 @@ function getStocks() {
 }
 function getStockByTicker(ticker) {
   let stock = stocks.find((stock) => stock.ticker === ticker);
+  if(!stock){
+    return {};
+  }
   return { stock };
 }
 
-function validateTradeData(tradeData) {
-  if (!tradeData.stockId && typeOf(tradeData.stockId) === 'number') {
+async function validateTradeData(tradeData) {
+  if (!tradeData.stockId || typeof tradeData.stockId !== 'number') {
     return 'Stock Id is required and should be a number';
   }
-  if (!tradeData.quantity && typeOf(tradeData.quantity) === 'number') {
+  if (!tradeData.quantity || typeof tradeData.quantity !== 'number') {
     return 'Quantity is required and should be a number';
   }
-  if (!tradeData.tradeType && typeOf(tradeData.tradeType) === 'string') {
-    return 'Trade Type is required and should be a number';
+  if (!tradeData.tradeType || typeof tradeData.tradeType !== 'string') {
+    return 'Trade Type is required and should be a string';
   }
-  if (!tradeData.tradeDate && typeOf(tradeData.tradeDate) === 'string') {
-    return 'Trade Date is required and should be a number';
+  if (!tradeData.tradeDate || typeof tradeData.tradeDate  !== 'string') {
+    return 'Trade Date is required and should be a string';
   }
+  return null;
 }
 
-module.exports = { getStocks, getStockByTicker, validateTradeData };
+async function addData(tradeVal){
+  let trade = { id: trades.length + 1, ...tradeVal };
+  trades.push(trade);
+  return trade;
+}
+
+module.exports = { getStocks, getStockByTicker, validateTradeData ,addData};

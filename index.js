@@ -5,6 +5,7 @@ const {
   getStocks,
   getStockByTicker,
   validateTradeData,
+  addData,
 } = require('./controllers');
 
 const app = express();
@@ -20,20 +21,21 @@ app.get('/stocks', (req, res) => {
 
 app.get('/stocks/:ticker', (req, res) => {
   let ticker = req.params.ticker;
-  console.log(ticker);
   let stock = getStockByTicker(ticker);
-  console.log(stock);
+  if(stock){
+    return res.status(404).send("Ticker Not Found");
+  }
   res.json(stock);
 });
 
-app.post('/trades/new', (req, res) => {
+app.post('/trades/new', async (req, res) => {
   let tradesData = req.body;
-  const error = validateTradeData(tradesData);
-  if (!error) {
+  const error = await validateTradeData(tradesData);
+  console.log(error);
+  if (error) {
     return res.status(400).json({ error });
   }
-  trade = { id: trades.length + 1, ...tradesData };
-  trades.push(trade);
+  let trade = await addData(tradesData);
   res.status(201).json({ trade });
 });
 
