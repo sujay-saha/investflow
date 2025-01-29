@@ -5,7 +5,7 @@ const {
   getStocks,
   getStockByTicker,
   validateTradeData,
-  addData,
+  addTrade,
 } = require('./controllers');
 
 const app = express();
@@ -14,33 +14,32 @@ app.use(express.json());
 
 const port = 3000;
 
-app.get('/stocks', (req, res) => {
-  let stocks = getStocks();
-  res.json(stocks);
+app.get('/stocks',  (req, res) => {
+  let stocks =  getStocks();
+  res.status(200).json(stocks);
 });
 
-app.get('/stocks/:ticker', (req, res) => {
+app.get('/stocks/:ticker', async (req, res) => {
   let ticker = req.params.ticker;
-  let stock = getStockByTicker(ticker);
-  if(stock){
+  let stock = await getStockByTicker(ticker);
+  if(!stock){
     return res.status(404).send("Ticker Not Found");
   }
-  res.json(stock);
+  res.status(200).json(stock);
 });
 
 app.post('/trades/new', async (req, res) => {
   let tradesData = req.body;
-  const error = await validateTradeData(tradesData);
-  console.log(error);
+  const error = validateTradeData(tradesData);
   if (error) {
-    return res.status(400).json({ error });
+    return res.status(400).json( error );
   }
-  let trade = await addData(tradesData);
+  let trade = await addTrade(tradesData);
   res.status(201).json({ trade });
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`#Example app listening at http://localhost:${port}`);
 });
 
 module.exports = { app };
